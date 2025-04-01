@@ -1,6 +1,7 @@
 # Restaurant Finder
 
-**Description:** This project is a simple Flask-based web application that allows users to search for the top 10 restaurants in the UK based on a postcode. It fetches restaurant data from the Just Eat API and displays the results in a clean, user-friendly interface. The application also integrates the Postcodes.io API to fetch the region associated with the entered postcode.
+## Description
+This project is a simple Flask-based web application that allows users to search for the top 10 restaurants in the UK based on a postcode. It fetches restaurant data from the Just Eat API and displays the results in a clean, user-friendly interface. The application also integrates the Postcodes.io API to fetch the region associated with the entered postcode.
 
 ## Features
  - Validates UK postcodes using a regular expression.
