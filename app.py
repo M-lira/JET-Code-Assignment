@@ -1,6 +1,7 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import requests
 import re
+import logging
 
 app = Flask(__name__)
 
@@ -9,59 +10,105 @@ API_URL = "https://uk.api.just-eat.io/discovery/uk/restaurants/enriched/bypostco
 
 #Pass through cloudfare block
 HEADERS = {
-   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-    "Accept": "application/json",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Connection": "keep-alive"
+     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+     "Accept": "application/json",
+     "Referer": "https://www.just-eat.co.uk/",
+     "Origin": "https://www.just-eat.co.uk/",
 }
+
 
 
 # Fetch top 10 rstaurants for a given postcode
 def fetch_restaurant_data(postcode):
     try:
-        response = requests.get(API_URL.format(postcode = postcode), headers = HEADERS)
+        url = API_URL.format(postcode=postcode)
+
+        response = requests.get(url, headers = HEADERS)
 
         if response.status_code == 200:
+
             data = response.json() #Parse the JSON response
-            restaurants = data.get('restaurants', [])[:10]
-            return restaurants
-        
+            restaurants = data.get('restaurants', [])
+
+            #sort restaurants rating in descending order
+            restaurants.sort(key=lambda x: x.get('rating', {}).get('starRating', 0), reverse= True)
+
+            return restaurants[:10] #return the top 10 restaurants
+
         else:
-            print( f"Error: {response.status_code} - {response.text}")
-            return []
+            logging.error(f"Error: {response.status_code} - {response.text}")
+            return[]
         
     except Exception as e:
-        print(f"An error as ocurred: {e}")
-        return []
+        logging.exception(f"An error occurred: {e}") #Log full exception details
+        return[]
 
+
+#Simple UK postcode validation using regex
+def is_valid_postcode(postcode):
+     #this regex is a basic validation for UK postcodes (it may not be exhaustive)
+     postcode_regex = r"(GIR 0AA|[A-Z]{1,2}\d[A-Z\d]? \d[A-Z]{2}|[A-Z]{1,2}\d{1,2}[A-Z]? \d[A-Z]{2})$"
+     return bool(re.match(postcode_regex, postcode.strip().upper()))
+
+
+#Fetches the city/region associated with a UK postcode via API
+def get_region_from_postcode(postcode):
+     try: 
+         url_region_API= f"https://api.postcodes.io/postcodes/{postcode}"
+         response = requests.get(url_region_API)
+
+         if response.status_code == 200:
+             data = response.json()
+             return data["result"]["admin_district"] # returns city or region nam
+
+         else:
+             print(f"Error while fetching the postcode region")
+             return"Unknown Region"
+             
+     except Exception as e:
+         print(f"Error while fetching the postcode region")
+         return"Unknown Region"
 
 
 
 #Route for the homepage
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
+def home(): # main function
 
-# Main data handling 
-def home():
+    postcode = "M16 0RA" # This is the default postcode choosen, but it can be replaced with any desired one, as long as it is within the UK region
+    restaurants = []
+    error_message= None
 
-    postcode = "M16 0RA" #This is the default code choosen but it can be replaced with the desired one as long as it is within the UK region
-    restaurants = fetch_restaurant_data(postcode)
+    if request.method == 'POST':
+         
+            postcode = request.form.get('postcode', '').strip() 
 
+            if is_valid_postcode(postcode):
+                region = get_region_from_postcode(postcode) # Get the city name, mainly for asthetic purposes
+                restaurants = fetch_restaurant_data(postcode)
+
+                if not restaurants:
+                    error_message = "No restaurants found for this {region}."
+
+            else: 
+                error_message = "Please enter a valid UK postcode."
+    
     #prepare the restaurant data for display
-    restaurant_list = []
-    for restaurant in restaurants:
-                name = restaurant.get('name')
-                cuisines = ','.join([cuisine ['name'] for cuisine in restaurant.get('cuisines', [])])
-                rating_info = restaurant.get('rating',{})
-                rating = f"{rating_info.get('starRating', 'N/A')}⭐ ({rating_info.get('count', 0)} reviews)"
-                address = restaurant.get('address', {}).get('line_1', 'No address listed')
-   
-                restaurant_list.append({
-                        'name' : name,
-                        'cuisines' : cuisines,
-                        'rating' : rating,
-                        'address' : address
-                    })
-    return render_template('index.html', restaurants=restaurant_list)
+    restaurant_list = [
+                {
+                        'name' : restaurant.get('name','Unknown'),
+                        'cuisines' : ','.join([cuisine ['name'] for cuisine in restaurant.get('cuisines', [])]),
+                        'rating': f"{restaurant.get('rating', {}).get('starRating', 'N/A')}⭐ ({restaurant.get('rating', {}).get('count', 0)} reviews)",
+                        'address' :  f"{restaurant.get('address', {}).get('line_1', 'No address listed')}, "
+                                     f"{restaurant.get('address', {}).get('postcode', '')}".strip() #formatting of address
+                }
+
+                for restaurant in restaurants
+            
+            ]
+
+    
+    return render_template('index.html', restaurants=restaurant_list, postcode=postcode, error_message=error_message, region=region)
 
 
     

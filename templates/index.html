@@ -1,35 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Top 10 restaurants in the area</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Restaurant Finder</title>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Link to external CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Top 10 restaurants in the area</h1>
-
-    <form action="/" method="GET">
-
-        <label for="postcode"> Enter a UK postcode:</label>
-        <input type="text" id="postcode" name="postcode" value="{{postcode}}" required>
-        <button type="submit">Search</button>
-    
+  <div class="container">
+    <header>
+      <h1>Restaurant Finder</h1>
+      <p>Discover the best restaurants in your area</p>
+    </header>
+    <form method="POST" class="search-form">
+      <input type="text" name="postcode" placeholder="Enter UK Postcode" value="{{ postcode }}" required>
+      <button type="submit">Search</button>
     </form>
-
-
-       {% if restaurants %} 
-        <ul>
-            {% for restaurant in restaurants %}
-                <li>
-                    <strong>{{restaurant.name}}</strong><br>
-                    Cuisine: {{ restaurant.Cuisines}} <br>
-                    Rating: {{ restaurant.rating}} <br>
-                    Address: {{ restaurant.address}}
-                </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-            <p> No restaurants found for this postcode.</p>
-        {% endif %}
+    {% if error_message %}
+      <div class="error">{{ error_message }}</div>
+    {% endif %}
+    <section class="restaurant-list">
+      {% if restaurants %}
+        <h2>Top 10 restaurants in {{region}}</h2>
+        <div class="cards">
+          {% for restaurant in restaurants %}
+            <div class="card">
+              <h3>{{ restaurant.name }}</h3>
+              <p class="cuisines"><strong>Cuisines:</strong> {{ restaurant.cuisines }}</p>
+              <p class="rating"><strong>Rating:</strong> {{ restaurant.rating }}</p>
+              <p class="address"><strong>Address:</strong> {{ restaurant.address }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="no-results">No restaurants available for this postcode.</p>
+      {% endif %}
+    </section>
+    <footer>
+      <p>&copy; {{ 2025 }} Restaurant Finder. All rights reserved.</p>
+    </footer>
+  </div>
 </body>
 </html>
