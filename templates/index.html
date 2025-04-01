@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 10 restaurants in the area</title>
+</head>
+<body>
+    <h1>Top 10 restaurants in the area</h1>
+
+    <form action="/" method="GET">
+
+        <label for="postcode"> Enter a UK postcode:</label>
+        <input type="text" id="postcode" name="postcode" value="{{postcode}}" required>
+        <button type="submit">Search</button>
+    
+    </form>
+
+
+       {% if restaurants %} 
+        <ul>
+            {% for restaurant in restaurants %}
+                <li>
+                    <strong>{{restaurant.name}}</strong><br>
+                    Cuisine: {{ restaurant.Cuisines}} <br>
+                    Rating: {{ restaurant.rating}} <br>
+                    Address: {{ restaurant.address}}
+                </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <p> No restaurants found for this postcode.</p>
+        {% endif %}
+</body>
+</html>
