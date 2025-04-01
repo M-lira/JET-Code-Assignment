@@ -4,29 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Restaurant Finder</title>
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
-  <!-- Link to external CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+  <!-- Main Content -->
   <div class="container">
     <header>
       <h1>Restaurant Finder</h1>
-      <p>Discover the best restaurants in your area</p>
+      <p>Discover the best restaurants in your region.</p>
     </header>
+    
     <form method="POST" class="search-form">
       <input type="text" name="postcode" placeholder="Enter UK Postcode" value="{{ postcode }}" required>
       <button type="submit">Search</button>
     </form>
+    
     {% if error_message %}
-      <div class="error">{{ error_message }}</div>
+      <div class="error">⚠️ {{ error_message }}</div>
     {% endif %}
-    <section class="restaurant-list">
-      {% if restaurants %}
-        <h2>Top 10 restaurants in {{region}}</h2>
-        <div class="cards">
-          {% for restaurant in restaurants %}
+    
+    {% if postcode and restaurants %}  <!-- Only display restaurant results if postcode is entered -->
+      <section class="restaurant-list">
+        <br>
+        <h2>Top 10 restaurants in {{ region }}</h2>
+        <div class="cards-grid">
+          {% for restaurant in restaurants[0:10] %}
             <div class="card">
               <h3>{{ restaurant.name }}</h3>
               <p class="cuisines"><strong>Cuisines:</strong> {{ restaurant.cuisines }}</p>
@@ -35,13 +38,21 @@
             </div>
           {% endfor %}
         </div>
-      {% else %}
-        <p class="no-results">No restaurants available for this postcode.</p>
-      {% endif %}
-    </section>
+      </section>
+    {% elif postcode %}
+      <!-- Show message when no restaurants found, only if a postcode was entered -->
+      <p class="no-results">No restaurants found for this postcode.</p>
+    {% endif %}
+    
     <footer>
-      <p>&copy; {{ 2025 }} Restaurant Finder. All rights reserved.</p>
+      <p class="copyright">&copy; 2025 Restaurant Finder. All rights reserved.</p>
+      <p class="coded-by">Coded by Mariana Lira</p>
     </footer>
+  </div>
+
+  <!-- Background Image -->
+  <div class="background">
+    <img src="{{ url_for('static', filename='images/shape-1.png') }}" alt="Shape 1" class="bg-image" id="bg1">
   </div>
 </body>
 </html>

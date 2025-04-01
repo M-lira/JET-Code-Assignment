@@ -70,37 +70,52 @@ def get_region_from_postcode(postcode):
          return"Unknown Region"
 
 
+#filters the words I don't want to be shown as cuisines
+def filter_cuisines(cuisine_list):
+
+    excluded_cuisines = [
+        "Deals", "Low Delivery Fee", "Cheeky Tuesday", "Freebies", 
+        "Halal", "Local Legends", "Shops", "Collect stamps", "£8 off", " *NEW*"
+    ]
+
+    return [cuisine['name'] for cuisine in cuisine_list if cuisine['name'] not in excluded_cuisines]
+
 
 #Route for the homepage
 @app.route('/', methods=['GET', 'POST'])
 def home(): # main function
 
-    postcode = "M16 0RA" # This is the default postcode choosen, but it can be replaced with any desired one, as long as it is within the UK region
+    postcode = ""
     restaurants = []
     error_message= None
+    region = 'Unknown Region'
 
     if request.method == 'POST':
          
             postcode = request.form.get('postcode', '').strip() 
 
-            if is_valid_postcode(postcode):
-                region = get_region_from_postcode(postcode) # Get the city name, mainly for asthetic purposes
-                restaurants = fetch_restaurant_data(postcode)
+            if postcode: #only proceed if postcode isn't empty
+                
+                if is_valid_postcode(postcode):
+                    region = get_region_from_postcode(postcode) # Get the city name, mainly for asthetic purposes
+                    restaurants = fetch_restaurant_data(postcode)
 
-                if not restaurants:
-                    error_message = "No restaurants found for this {region}."
+                    if not restaurants:
+                        error_message = "No restaurants found for this {region}."
 
-            else: 
-                error_message = "Please enter a valid UK postcode."
-    
+                else: 
+                    error_message = "Please enter a valid UK postcode."
+            else:
+                error_message = None
+        
     #prepare the restaurant data for display
     restaurant_list = [
                 {
                         'name' : restaurant.get('name','Unknown'),
-                        'cuisines' : ','.join([cuisine ['name'] for cuisine in restaurant.get('cuisines', [])]),
+                        'cuisines' : ', '.join(filter_cuisines( restaurant.get('cuisines', []))),
                         'rating': f"{restaurant.get('rating', {}).get('starRating', 'N/A')}⭐ ({restaurant.get('rating', {}).get('count', 0)} reviews)",
-                        'address' :  f"{restaurant.get('address', {}).get('line_1', 'No address listed')}, "
-                                     f"{restaurant.get('address', {}).get('postcode', '')}".strip() #formatting of address
+                        'address': restaurant.get('metaData', {}).get('district', region)
+
                 }
 
                 for restaurant in restaurants
