@@ -24,7 +24,7 @@
       <div class="error">⚠️ {{ error_message }}</div>
     {% endif %}
     
-    {% if postcode and restaurants %}  <!-- Only display restaurant results if postcode is entered -->
+    {% if postcode and restaurants %} 
       <section class="restaurant-list">
         <br>
         <h2>Top 10 restaurants in {{ region }}</h2>
@@ -40,7 +40,6 @@
         </div>
       </section>
     {% elif postcode %}
-      <!-- Show message when no restaurants found, only if a postcode was entered -->
       <p class="no-results">No restaurants found for this postcode.</p>
     {% endif %}
     

@@ -11,27 +11,27 @@ body {
   min-height: 100vh;
 }
 
-/* Background for images (outside the body) */
+
 .background {
-  position: fixed; /* Fixed positioning so image stays in place when scrolling */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: -1; /* Ensure image stays behind the content */
-  pointer-events: none; /* Prevent background from blocking user interaction */
+  z-index: -1; 
+  pointer-events: none; 
 }
 
-/* Single image to cover the background */
+
 .background .bg-image {
   position: absolute;
   top: 0;
   left: 0;
-  width: 120%;       /* Enlarged so edges extend beyond viewport */
-  height: 120%;      /* Enlarged height */
-  background-image: url('images/shape-1.png'); /* Replace with your image path */
-  background-size: cover;       /* Cover the entire background */
-  background-position: top left; /* Align with top-left */
+  width: 150%;       
+  height: 150%;      
+  background-image: url('images/shape-1.png'); 
+  background-size: cover;    
+  background-position: top left;
   opacity: 0.7;
   animation: moveBackground 10s infinite ease-in-out;
 }
@@ -49,17 +49,17 @@ body {
   }
 }
 
-/* Container and Content */
+
 .container {
   max-width: 1100px;
-  margin: 80px auto; /* Increased top margin for more space */
+  margin: 80px auto; 
   padding: 30px;
   background: #fff;
   border-radius: 15px;
   box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.15);
   text-align: center;
   overflow: hidden;
-  z-index: 1; /* Ensure content is on top of background images */
+  z-index: 1; 
 }
 
 /* Header */
@@ -74,12 +74,12 @@ header h1 {
 header p {
   font-size: 18px;
   color: #555;
-  margin-bottom: 50px; /* Increased bottom margin for more space below the header */
+  margin-bottom: 50px; 
 }
 
-/* Search Form */
+
 .search-form {
-  margin: 50px 0 30px 0; /* Increased top margin and bottom margin for more space */
+  margin: 50px 0 30px 0;
   display: flex;
   justify-content: center;
   gap: 15px;
@@ -126,19 +126,19 @@ header p {
   font-size: 16px;
 }
 
-/* Restaurant List */
+
 .restaurant-list h2 {
-  margin-bottom: 50px; /*space between heading and cards */
+  margin-bottom: 50px; 
   font-size: 35px;
   color: #333;
   font-weight: 600;
 }
 
-/* Grid Layout for 10 Cards in 2 Columns */
+
 .cards-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 30px 40px; /* 30px row gap, 40px column gap */
+  gap: 30px 40px;
   margin-top: 20px;
 }
 
