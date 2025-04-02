@@ -27,8 +27,8 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 150%;       
-  height: 150%;      
+  width: 120%;       
+  height: 120%;      
   background-image: url('images/shape-1.png'); 
   background-size: cover;    
   background-position: top left;
